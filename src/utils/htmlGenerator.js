@@ -386,6 +386,7 @@ export async function generateStaticHtmlFile(patchVersion, summaryText) {
           // --- 1. 섹션 경계 전환 감지 ---
           if (line.startsWith('## 패치 하이라이트')) {
             currentSection = 'highlights';
+            resultHtml += `<h2>🎮 패치 하이라이트</h2>\n`;
             continue;
           }
           if (line.startsWith('## 챔피언')) {
@@ -403,8 +404,16 @@ export async function generateStaticHtmlFile(patchVersion, summaryText) {
 
           // --- 2. 섹션별 최적화 파싱 적용 ---
           if (currentSection === 'highlights') {
-            // 💡 패치 하이라이트(대표 이미지 및 타이틀 요약글)는 유저의 깔끔한 디자인 선호에 따라 렌더링을 완전히 배제(Skip)합니다.
-            continue;
+            // 💡 [요구사항 2] 패치하이라이트는 현재의 비주얼과 크기를 완벽하게 유지
+            if (line.startsWith('![lol-image]')) {
+              const imgUrlMatch = line.match(/!\[lol-image\]\((.*?)\)/);
+              if (imgUrlMatch) {
+                resultHtml += `<div class="patch-img-box"><img src="${imgUrlMatch[1]}" class="patch-img" alt="lol-patch-artwork"></div>\n`;
+              }
+            } else {
+              let paragraphText = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+              resultHtml += `<p style="margin-bottom: 12px; text-align: center;">${paragraphText}</p>\n`;
+            }
           } 
           
           else if (currentSection === 'champions') {

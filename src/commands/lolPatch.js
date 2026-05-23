@@ -66,9 +66,10 @@ export async function handleLolPatchCommand(message, isPrev = false) {
       `• **데이터 상태:** ${isCached ? '🟢 로컬 파일 캐시 히트 (초고속 반환)' : '🆕 실시간 본문 원본 스크랩 완료'}\n\n` +
       `🔗 **공식 롤 홈페이지 바로가기:**\n` +
       ` ${fullUrl}\n\n` +
-      `🎨 **실시간 롤 패치노트 프리미엄 HTML 리포트:**\n` +
+      `🎨 **실시간 긁어온 본문 데이터 원본 HTML 리포트:**\n` +
       `🔗 ${htmlLink}\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `*※ AI 가공 전에, 롤 공홈 기사 본문 텍스트가 정상적으로 수집되었는지 눈으로 직접 확인할 수 있는 원본 파일입니다.*`;
 
     await message.reply(lolPatchReply);
 
