@@ -595,7 +595,7 @@ export async function generateStaticHtmlFile(patchVersion, summaryText) {
     try {
       console.log(`📡 [Git Auto Deploy] GitHub Pages 클라우드 서버로 배포(git push) 시작...`);
       execSync('git add public/rendered/', { cwd: projectRoot, stdio: 'ignore' });
-      execSync(`git commit -m "chore: [Auto Deploy] LOL Patch ${patchVersion} Report Update"`, { cwd: projectRoot, stdio: 'ignore' });
+      execSync(`git commit -m "[Auto Deploy][New Patch] LOL Patch ${patchVersion} Report Update"`, { cwd: projectRoot, stdio: 'ignore' });
       execSync('git push', { cwd: projectRoot, stdio: 'ignore' });
       console.log(`🟢 [Git Auto Deploy] GitHub 저장소 원격 push 성공! Pages 빌드가 깃허브 백그라운드에서 진행됩니다.`);
     } catch (gitErr) {
