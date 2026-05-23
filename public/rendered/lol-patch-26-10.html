@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 LoL 26.10 패치노트 실시간 AI 브리핑</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(22, 31, 50, 0.7);
+      --border-color: rgba(200, 170, 110, 0.2);
+      --primary-color: #c8aa6e; /* 롤 골드 컬러 */
+      --text-color: #f0f0f5;
+      --text-muted: #a0a5b5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #161f32 0%, var(--bg-color) 70%);
+      color: var(--text-color);
+      font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    /* 💡 [요구사항 1] 가운데 container 영역 유지 및 세련되게 장식 */
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      text-shadow: 0 0 10px rgba(200, 170, 110, 0.3);
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .content-box {
+      font-size: 17px;
+      line-height: 1.8;
+      color: var(--text-color);
+    }
+
+    /* 💡 [요구사항 2] 패치 하이라이트 전용 레이아웃 및 크기 완벽 유지 */
+    .patch-img-box {
+      text-align: center;
+      margin: 25px 0;
+      animation: fadeIn 1.2s ease-out;
+    }
+
+    .patch-img {
+      border-radius: 12px;
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+      transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s;
+    }
+
+    .patch-img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 15px 30px rgba(200, 170, 110, 0.25);
+    }
+
+    /* 공통 목차 헤더 스타일 */
+    .content-box h2 {
+      color: var(--primary-color);
+      font-size: 22px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+      padding-left: 12px;
+      letter-spacing: 1px;
+    }
+
+    /* 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 스타일 */
+    .champions-container {
+      margin-top: 20px;
+    }
+
+    .champion-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(200, 170, 110, 0.15);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 25px;
+      transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .champion-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(200, 170, 110, 0.4);
+      box-shadow: 0 8px 25px rgba(200, 170, 110, 0.12);
+    }
+
+    /* 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 */
+    .champ-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid rgba(200, 170, 110, 0.1);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+
+    .champ-portrait {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-color);
+      box-shadow: 0 0 10px rgba(200, 170, 110, 0.3);
+    }
+
+    .champ-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 */
+    .champ-changes {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .skill-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 15px;
+    }
+
+    .skill-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .skill-left {
+      flex-shrink: 0;
+    }
+
+    .skill-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .skill-icon:hover {
+      transform: scale(1.1);
+    }
+
+    .skill-icon-placeholder {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(200, 170, 110, 0.1);
+      border: 1px solid var(--border-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    .skill-right {
+      flex-grow: 1;
+    }
+
+    .skill-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .skill-right ul {
+      list-style-type: none;
+      margin-left: 0;
+      margin-bottom: 0;
+    }
+
+    .skill-right li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #d1d5db;
+      margin-bottom: 5px;
+    }
+
+    .skill-right li:last-child {
+      margin-bottom: 0;
+    }
+
+    .skill-right li::before {
+      content: "✦";
+      position: absolute;
+      left: 0;
+      color: var(--primary-color);
+      font-size: 12px;
+    }
+
+    /* 화살표 가독성 부스터 */
+    .arrow-indicator {
+      color: #ff9d00;
+      font-weight: bold;
+      margin: 0 5px;
+      text-shadow: 0 0 5px rgba(255, 157, 0, 0.4);
+    }
+
+    /* 아이템 및 룬 섹션 미려한 가로형 한 줄 컨테이너 */
+    .items-list, .runes-list {
+      list-style-type: none;
+      margin-bottom: 40px;
+    }
+
+    .item-icon-box, .rune-icon-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 25px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 8px;
+    }
+
+    .item-inline-icon, .rune-inline-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid rgba(200, 170, 110, 0.3);
+    }
+
+    .item-name, .rune-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .item-change-detail, .rune-change-detail {
+      position: relative;
+      padding-left: 20px;
+      font-size: 14px;
+      color: #d1d5db;
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+
+    .item-change-detail::before, .rune-change-detail::before {
+      content: "✦";
+      position: absolute;
+      left: 0;
+      color: var(--primary-color);
+    }
+
+    footer {
+      margin-top: 40px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    footer a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🎮 LEAGUE OF LEGENDS</h1>
+      <p>26.10 패치노트 실시간 AI 브리핑 리포트</p>
+    </header>
+
+    <div class="content-box">
+      <h2>🎮 패치 하이라이트</h2>
+<div class="patch-img-box"><img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/6976c9ee869582a83ffcbd7a835fb249c7b4ac69-1920x1080.png" class="patch-img" alt="lol-patch-artwork"></div>
+<p style="margin-bottom: 12px; text-align: center;">비의 인도자 아이번, 프로젝트: 퀸이 이번 패치 기간에 출시됩니다.</p>
+<h2>⚔️ 챔피언 밸런스 조정</h2>
+<div class="champions-container">
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Ambessa.png" class="champ-portrait" alt="암베사">
+      <span class="champ-name">암베사</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/AmbessaQ.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>Q - 교활한 휩쓸기 / 파멸의 일격</li>
+            <li>대상 최대 체력 비례 피해량: 2/3/4/5/6% <span class="arrow-indicator">⇒</span> 4/4.5/5/5.5/6%</li>
+            <li>몬스터 대상 추가 피해량: 125 <span class="arrow-indicator">⇒</span> 75</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/AmbessaR.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>R - 공개 처형</li>
+            <li>체력 회복량: 10/12.5/15% <span class="arrow-indicator">⇒</span> 15/17.5/20%</li>
+            <li>몬스터 대상 체력 회복 효과: 40% <span class="arrow-indicator">⇒</span> 25%</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Anivia.png" class="champ-portrait" alt="애니비아">
+      <span class="champ-name">애니비아</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <div class="skill-icon-placeholder">✦</div>
+        </div>
+        <div class="skill-right">
+          <div class="skill-name">기본 능력치</div>
+          <ul>
+            <li>기본 방어력: 21 <span class="arrow-indicator">⇒</span> 19</li>
+            <li>방어력 증가량: 4.5 <span class="arrow-indicator">⇒</span> 4.1</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Ashe.png" class="champ-portrait" alt="애쉬">
+      <span class="champ-name">애쉬</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/AsheQ.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>Q - 궁사의 집중</li>
+            <li>총피해량: 공격력의 110/117.5/125/132.5/140% <span class="arrow-indicator">⇒</span> 공격력의 110/115/120/125/130%</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Galio.png" class="champ-portrait" alt="갈리오">
+      <span class="champ-name">갈리오</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/GalioQ.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>Q - 전장의 돌풍</li>
+            <li>마나 소모량: 70/75/80/85/90 <span class="arrow-indicator">⇒</span> 60/65/70/75/80</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/GalioE.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>E - 정의의 주먹</li>
+            <li>총피해량: 90/130/170/210/250 (+주문력의 90%) <span class="arrow-indicator">⇒</span> 100/135/170/205/240 (+주문력의 100%)</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/GalioR.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>R - 영웅출현</li>
+            <li>신규 총피해량: 추가 마법 저항력 계수 100%가 추가됩니다.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/LeeSin.png" class="champ-portrait" alt="리 신">
+      <span class="champ-name">리 신</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/LeeSinWOne.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>W - 방호</li>
+            <li>보호막 흡수량: 70/115/160/205/250 (+주문력의 80%) <span class="arrow-indicator">⇒</span> 60/105/150/195/240 (+주문력의 80%)</li>
+            <li>기본 재사용 대기시간: 챔피언이 아닌 대상에게 사용 시 12초, 챔피언에게 사용 시 6초 <span class="arrow-indicator">⇒</span> 항상 7초</li>
+            <li>신규 보호막 획득 조건: 이제 리 신이 미니언이나 와드를 향해 돌진할 때도 보호막을 얻습니다.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/LeeSinEOne.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>E - 폭풍</li>
+            <li>마법 피해량: 35/60/85/110/135 (+공격력의 100%) <span class="arrow-indicator">⇒</span> 35/60/85/110/135 (+공격력의 90%)</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/LeeSinR.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>R - 용의 분노</li>
+            <li>신규 조건 없는 부수 피해: 이제 스킬에 맞은 챔피언이 밀려나는 도중에 처치되더라도 계속해서 날아가며, 충돌한 적을 공중에 띄우고 피해를 입힙니다.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Naafiri.png" class="champ-portrait" alt="나피리">
+      <span class="champ-name">나피리</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/NaafiriQ.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>Q - 다르킨 단검</li>
+            <li>최소 추가 물리 피해량: 30/45/60/75/90 (+추가 공격력의 40%) <span class="arrow-indicator">⇒</span> 30/42.5/55/67.5/80 (+추가 공격력의 40%)</li>
+            <li>최대 추가 물리 피해량: 60/90/120/450/180 (+추가 공격력의 140%) <span class="arrow-indicator">⇒</span> 60/85/110/135/160 (+추가 공격력의 140%)</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/NaafiriR.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>R - 사냥개의 추적</li>
+            <li>물리 피해량: 150/250/350 (+추가 공격력의 120%) + 무리 1마리당 15/25/35 (+추가 공격력의 12%) <span class="arrow-indicator">⇒</span> 150/225/300 (+추가 공격력의 120%) + 무리 1마리당 15/22.5/30 (+추가 공격력의 12%)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Quinn.png" class="champ-portrait" alt="퀸">
+      <span class="champ-name">퀸</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.8.1/img/passive/Quinn_Passive.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>기본 지속 효과 - 매사냥</li>
+            <li>신규 몬스터 대상 추가 피해량: 50</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/QuinnQ.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>Q - 실명 공격</li>
+            <li>신규 몬스터 대상 추가 피해량: 이제 몬스터에게 50% 증가한 피해를 입힙니다.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/QuinnR.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>R - 후방 지원</li>
+            <li>마나 소모량: 100/50/0 <span class="arrow-indicator">⇒</span> 50/25/0</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Shyvana.png" class="champ-portrait" alt="쉬바나">
+      <span class="champ-name">쉬바나</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <div class="skill-icon-placeholder">✦</div>
+        </div>
+        <div class="skill-right">
+          <div class="skill-name">기본 능력치</div>
+          <ul>
+            <li>레벨당 체력 증가량: 100 <span class="arrow-indicator">⇒</span> 95</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/ShyvanaW.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>W - 지옥불 방패</li>
+            <li>재사용 대기시간: 13/12/11/10/9초 <span class="arrow-indicator">⇒</span> 13/12.25/11.5/10.75/10초</li>
+            <li>보호막 흡수량: 75/95/115/135/155 (+추가 체력의 12%) <span class="arrow-indicator">⇒</span> 60/80/100/120/140 (+추가 체력의 12%)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Smolder.png" class="champ-portrait" alt="스몰더">
+      <span class="champ-name">스몰더</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <div class="skill-icon-placeholder">✦</div>
+        </div>
+        <div class="skill-right">
+          <div class="skill-name">기본 능력치</div>
+          <ul>
+            <li>기본 공격력: 60 <span class="arrow-indicator">⇒</span> 58</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/SmolderQ.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>Q - 초강력 화염 숨결</li>
+            <li>피해량: 60/75/90/105/120 (+추가 공격력의 130%) <span class="arrow-indicator">⇒</span> 60/70/80/90/100 (+추가 공격력의 130%)</li>
+            <li>치명타 확률에 따른 피해 증가: 50% (+무한의 대검 보유 시 15%) <span class="arrow-indicator">⇒</span> 75% (+무한의 대검 보유 시 22.5%)</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/SmolderW.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>W - 에취!</li>
+            <li>폭발 물리 피해량: 10~110 (+추가 공격력의 65%) (+주문력의 80%) <span class="arrow-indicator">⇒</span> 10~110 (+추가 공격력의 50%) (+주문력의 80%)</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/SmolderR.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>R - 엄마아아아!</li>
+            <li>피해량: 200/300/400 (+추가 공격력의 110%) <span class="arrow-indicator">⇒</span> 150/250/350 (+추가 공격력의 100%)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/MonkeyKing.png" class="champ-portrait" alt="오공">
+      <span class="champ-name">오공</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/MonkeyKingDecoy.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>W - 분신 전사</li>
+            <li>분신 피해량: 30/35/40/45/50% <span class="arrow-indicator">⇒</span> 40/45/50/55/60%</li>
+            <li>분신 지속시간: 3.25초 <span class="arrow-indicator">⇒</span> 4초</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/MonkeyKingNimbus.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>E - 근두운 급습</li>
+            <li>추가 공격 속도: 35/40/45/50/55% <span class="arrow-indicator">⇒</span> 40/45/50/55/60%</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Zed.png" class="champ-portrait" alt="제드">
+      <span class="champ-name">제드</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.8.1/img/passive/ZedP.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>기본 지속 효과 - 약자 멸시</li>
+            <li>최대 체력 비례 피해량: 6/8/10% <span class="arrow-indicator">⇒</span> 5/7.5/10%</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/ZedE.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>E - 그림자 베기</li>
+            <li>피해량: 70/95/120/145/170 (+추가 공격력의 80%) <span class="arrow-indicator">⇒</span> 70/92.5/115/137.5/160 (+추가 공격력의 70%)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 [요구사항 3] 가로로 긴 챔피언별 카드 컨테이너 -->
+  <div class="champion-card">
+    <!-- 💡 [요구사항 3] 상단 헤더: 초상화 + 챔피언 이름 -->
+    <div class="champ-header">
+      <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/champion/Zeri.png" class="champ-portrait" alt="제리">
+      <span class="champ-name">제리</span>
+    </div>
+    <div class="champ-changes">
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/ZeriQ.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>Q - 집중 사격</li>
+            <li>기본 피해량: 21/24/27/30/33 <span class="arrow-indicator">⇒</span> 22/26/30/34/38</li>
+            <li>공격 속도 초과분의 공격력 전환 비율: 50% <span class="arrow-indicator">⇒</span> 60%</li>
+          </ul>
+        </div>
+      </div>
+      <!-- 💡 [요구사항 3] 가로 정렬 로우: 스킬 이미지 + 변경점 텍스트 -->
+      <div class="skill-row">
+        <div class="skill-left">
+          <img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/spell/ZeriR.png" class="skill-icon" alt="">
+        </div>
+        <div class="skill-right">
+          <div class="skill-name"></div>
+          <ul>
+            <li>R - 번개 방출</li>
+            <li>[버그 수정] 과충전 지속시간: 현재 궁극기 사용 중에 기본 공격을 가하면 스킬의 지속시간이 1.5초씩 늘어나고 있습니다. 새로운 이동 속도 중첩 지속시간에 맞춰, 스킬 지속시간이 기본 공격 1회당 2.5초씩 증가하도록 변경됩니다.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h2>🛡️ 아이템 변경 사항</h2>
+<ul class="items-list">
+  <div class="item-icon-box"><img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/f4dd1e2c39c1e953c0483e15c18a7ed22d0e9945-512x512.jpg" class="item-inline-icon"><span class="item-name">도란의 활</span></div>
+  <li class="item-change-detail">도란의 활은 지난 패치로 처음 추가된 아이템인데도 꽤 괜찮은 선택률을 보이는 중입니다. 하지만 시작 아이템이면서 체력을 제공하지 않는다는 점 때문에 높은 피해량이라는 장점이 빛을 발하지 못하고 있는데요. 이에 위험을 감수할 만한 가치가 있는 아이템으로 만들고자 합니다.</li>
+  <li class="item-change-detail">공격력: 6 <span class="arrow-indicator">⇒</span> 8</li>
+  <div class="item-icon-box"><img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/bc9f19b522a55901203db94e9c6bf708b3e24a91-512x512.jpg" class="item-inline-icon"><span class="item-name">도란의 투구</span></div>
+  <li class="item-change-detail">도란의 투구는 초반을 넘긴 뒤에도 계속 들고 있을 만한 아이템으로 설계되었습니다. 도란의 방패에 붙은 체력 재생에 비해 유통 기한이 긴 능력치인 방어력과 마법 저항력을 제공하는 것도 그 때문이죠. 하지만 현재로서는 그 초반도 쉽게 넘기기가 어려운 상태입니다. 따라서 게임이 본 궤도에 접어드는 중반까지 좀 더 수월하게 버틸 수 있게끔 이른 시점의 부담을 완화하려고 합니다.</li>
+  <li class="item-change-detail">체력: 110 <span class="arrow-indicator">⇒</span> 140</li>
+  <div class="item-icon-box"><img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/9b1ba3fbc73a4aadea8c057f78f00fa82d3820ba-512x512.png" class="item-inline-icon"><span class="item-name">탐욕의 군화 / 불멸의 길</span></div>
+  <li class="item-change-detail">이 새로운 모든 피해 흡혈 장화 시리즈는 저희 의도대로 장화 아이템 체계에 꼭 필요했던 선택지를 제공하고 있습니다. 공방 일체의 효과를 원하는 여러 고화력 챔피언에게 포지션을 불문하고 많은 사랑을 받는 중이죠. 다만 현재는 선택률이 다소 높은 편이기 때문에, 위력을 조금 낮춰 다른 선택지와의 균형을 맞추고자 합니다.</li>
+  <li class="item-change-detail">총가격: 950골드 <span class="arrow-indicator">⇒</span> 1,000골드</li>
+  <li class="item-change-detail">학살 중첩당 모든 피해 흡혈: 처치 관여 1회당 1%, 최대 6회 중첩 <span class="arrow-indicator">⇒</span> 처치 관여 1회당 0.6%, 최대 10회 중첩</li>
+  <div class="item-icon-box"><img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/item/3100.png" class="item-inline-icon"><span class="item-name">리치베인</span></div>
+  <li class="item-change-detail">지난 패치에 이어 두 주문력 기반 주문 검 아이템을 차별화하기 위한 조정이 이뤄집니다. 황혼과 새벽이 적에게 달려들어 주문 검 효과를 발동하는 식의 플레이에 맞게 변경된 만큼, 리치베인은 신중하게 접근해 한 번에 큰 피해를 입히는 형태로 활용되도록 그 이동 속도와 주문력 계수를 상향하고자 합니다.</li>
+  <li class="item-change-detail">주문력 계수: 40% <span class="arrow-indicator">⇒</span> 45%</li>
+  <li class="item-change-detail">이동 속도: 4% <span class="arrow-indicator">⇒</span> 6%</li>
+  <div class="item-icon-box"><img src="https://am-a.akamaihd.net/image?f=https://ddragon.leagueoflegends.com/cdn/16.9.1/img/item/6699.png" class="item-inline-icon"><span class="item-name">벼락폭풍검</span></div>
+  <li class="item-change-detail">벼락폭풍검은 성능이 조정되고 기회가 삭제되면서 예상대로 사용 빈도가 늘었습니다. 이 아이템이 메타에 얼굴을 비추기 시작한 건 기쁜 일이지만, 위력이 다소 지나치다고 생각되기에 가격을 높이기로 하였습니다.</li>
+  <li class="item-change-detail">총가격: 2,900골드 <span class="arrow-indicator">⇒</span> 3,000골드</li>
+</ul>
+
+<h2>🔮 룬 변경 사항</h2>
+<ul class="runes-list">
+  <div class="rune-icon-box"><img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/19235c247a219ac4e7ccec749b88155ce19ad7d6-512x512.png" class="rune-inline-icon"><span class="rune-name">죽음불꽃 손길</span></div>
+  <li class="rune-change-detail">죽음불꽃 손길은 긴급 수정으로 하향된 뒤에도 이른 시점의 공격로 피해 교환에서 과도한 화력을 보여 주고 있습니다. 이에 그 위압감을 덜기 위해 낮은 레벨에서 입히는 피해를 아주 약간만 떨어뜨리려고 합니다.</li>
+  <li class="rune-change-detail">초당 피해량: 4~12 (레벨에 따라) (+추가 공격력의 7%) (+주문력의 2.5%) <span class="arrow-indicator">⇒</span> 3~12 (레벨에 따라) (+추가 공격력의 7%) (+주문력의 2.5%)</li>
+  <div class="rune-icon-box"><img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/5ae14cecdba29981b15f30e5970c4a8c646140a3-512x512.png" class="rune-inline-icon"><span class="rune-name">폭풍전사의 포효</span></div>
+  <li class="rune-change-detail">폭풍전사의 포효는 다소 낮은 성능으로 출시되었습니다. 그 탓에 이를 사용하는 대부분의 챔피언이 저조한 성적을 내는 중이므로 효과의 지속시간을 늘리고자 합니다.</li>
+  <li class="rune-change-detail">이동 속도: [근접 챔피언 40% | 원거리 챔피언 30%], 지속시간 3초 <span class="arrow-indicator">⇒</span> [근접 챔피언 48% | 원거리 챔피언 36%], 지속시간 4초</li>
+</ul>
+
+    </div>
+
+    <footer>
+      <p>N_GameDiscordBot AI 시스템에 의해 실시간 가공되었습니다.</p>
+      <p>© 2026 Riot Games. All rights reserved. <a href="https://www.leagueoflegends.com" target="_blank">Riot Games 공식 홈</a></p>
+    </footer>
+  </div>
+
+</body>
+</html>
