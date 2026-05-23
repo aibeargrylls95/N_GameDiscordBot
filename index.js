@@ -1,5 +1,6 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
+import { handleLolPatchCommand } from './src/commands/lolPatch.js';
 
 // 1. .env 파일에 있는 환경변수 로드
 dotenv.config();
@@ -20,11 +21,11 @@ client.once('ready', () => {
   console.log('===================================================');
   console.log(`  🎮 N_GameDiscordBot이 성공적으로 시작되었습니다!`);
   console.log(`  🤖 봇 태그: ${client.user.tag}`);
-  console.log(`  🟢 상태: 온라인 (Online) - '봇-응답' 채널 전용`);
+  console.log(`  🟢 상태: 온라인 (Online) - 모듈형 아키텍처 가동 중`);
   console.log('===================================================');
 });
 
-// 4. 서버에 새로운 메시지가 올라왔을 때 감지하여 반응하는 매크로 이벤트
+// 4. 서버에 새로운 메시지가 올라왔을 때 감지하여 반응하는 이벤트 허브
 client.on('messageCreate', async (message) => {
   // 봇이 자기 자신의 메시지에 응답하거나 다른 봇의 메시지이면 무시 (무한 루프 방지)
   if (message.author.bot) return;
@@ -35,7 +36,7 @@ client.on('messageCreate', async (message) => {
   // [요구사항 1] 채널명이 정확하게 '봇-응답'일 때만 아래 명령어들을 실행합니다.
   if (message.channel.name !== '봇-응답') return;
 
-  // [기능 1] 봇 상태 및 안내 (요구사항: '봇 정보', '!봇정보', '!정보' 모두 대응)
+  // [기능 1] 봇 상태 및 명령어 안내판 조회
   const isInfoCommand = 
     message.content === '봇 정보' || 
     message.content === '!봇정보' || 
@@ -46,7 +47,7 @@ client.on('messageCreate', async (message) => {
     const botInfo = 
       `🤖 **N_GameDiscordBot 정보 안내**\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `• **상태:** 🟢 정상 작동 중\n` +
+      `• **상태:** 🟢 정상 작동 중 (클린 아키텍처)\n` +
       `• **허용 채널:** 💬 #봇-응답\n` +
       `• **언어:** JavaScript (Node.js + discord.js v14)\n` +
       `• **구동 환경:** 로컬 테스트 중 💻\n\n` +
@@ -75,95 +76,27 @@ client.on('messageCreate', async (message) => {
     return;
   }
 
-  // [기능 4] 최신/이전 롤 패치노트 실시간 크롤링 조회 통합 기능
-  // ⭐ [요구사항] 단축어 '!패치'를 최신 패치노트 감지 조건에 추가했습니다.
+  // [기능 4] 최신 롤 패치 조회 매크로
   const isLolPatch = 
     message.content === '!롤패치' || 
     message.content === '!롤현재패치' || 
     message.content === '!롤최근패치' ||
     message.content === '!패치';
-    
+
+  if (isLolPatch) {
+    // ⚙️ [역할 분리] 실제 비즈니스 시나리오는 lolPatch.js 컨트롤러에게 전적으로 대행 위임!
+    await handleLolPatchCommand(message, false);
+    return;
+  }
+
+  // [기능 5] 지난 롤 패치 조회 매크로
   const isLolPrevPatch = 
     message.content === '!지난패치' || 
     message.content === '!이전패치';
 
-  if (isLolPatch || isLolPrevPatch) {
-    console.log(`[명령어] ${message.author.tag} 님이 롤 패치 명령어를 입력했습니다: ${message.content}`);
-    
-    // 유저에게 잠시 통신 중임을 알릴 수 있도록 입력 중 상태 표시
-    await message.channel.sendTyping();
-
-    try {
-      // 1) 롤 공식 홈페이지 게임 업데이트 뉴스 리스트 HTML을 가져옵니다.
-      const response = await fetch('https://www.leagueoflegends.com/ko-kr/news/game-updates/', {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('공식 홈페이지 접속 불량');
-      }
-
-      const html = await response.text();
-
-      // 2) 정규표현식으로 패치노트 URL 리스트 추출
-      const patchUrlRegex = /\/ko-kr\/news\/game-updates\/[a-zA-Z0-9-]*patch-[0-9a-zA-Z-]+-notes\/?/g;
-      const matches = html.match(patchUrlRegex);
-
-      if (!matches || matches.length === 0) {
-        throw new Error('HTML에서 패치노트 URL 매칭 실패');
-      }
-
-      // 중복 링크들을 필터링하여 순수한 고유 순서 배열을 만듭니다.
-      const uniqueMatches = [...new Set(matches)];
-
-      // 3) 최신 패치 또는 지난 패치 분기 처리
-      let targetPath = '';
-      let patchTitleLabel = '';
-
-      if (isLolPatch) {
-        // [최신 패치]: 첫 번째 항목
-        targetPath = uniqueMatches[0];
-        patchTitleLabel = '최신 릴리즈';
-      } else {
-        // [지난 패치]: 두 번째 항목
-        if (uniqueMatches.length < 2) {
-          await message.reply('❌ 현재 공식 홈페이지 목록에서 이전 패치노트 링크를 찾을 수 없습니다.');
-          return;
-        }
-        targetPath = uniqueMatches[1];
-        patchTitleLabel = '바로 지난번(이전)';
-      }
-
-      const fullUrl = `https://www.leagueoflegends.com${targetPath}`;
-
-      // 4) 가져온 실제 URL에서 버전 명칭 역추적 파싱 (예: "patch-26-10-notes" -> "26.10 패치")
-      const versionMatch = targetPath.match(/patch-(\d+)-(\d+)-notes/);
-      let patchDisplayName = '패치';
-      
-      if (versionMatch && versionMatch.length >= 3) {
-        patchDisplayName = `${versionMatch[1]}.${versionMatch[2]} 패치`;
-      }
-
-      // 5) 디스코드 응답 전송
-      const lolPatchReply = 
-        `🏆 **League of Legends 실시간 패치 정보**\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `• **인식 영역:** **${patchTitleLabel}**\n` +
-        `• **해당 패치 버전:** **${patchDisplayName}**\n` +
-        `• **공식 한글 패치노트 바로가기:**\n` +
-        `🔗 ${fullUrl}\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `*※ 공식 홈페이지에서 1초 만에 실시간 크롤링하여 정확한 한글 패치 정보를 보장합니다.*`;
-
-      await message.reply(lolPatchReply);
-      console.log(`[성공] 패치노트 링크 전송 완료 (${patchTitleLabel}): ${fullUrl}`);
-
-    } catch (error) {
-      console.error('롤 패치 크롤링 에러:', error);
-      await message.reply('❌ 롤 공식 홈페이지로부터 패치 소식을 긁어오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    }
+  if (isLolPrevPatch) {
+    // ⚙️ [역할 분리] 실제 비즈니스 시나리오는 lolPatch.js 컨트롤러에게 전적으로 대행 위임!
+    await handleLolPatchCommand(message, true);
     return;
   }
 });
