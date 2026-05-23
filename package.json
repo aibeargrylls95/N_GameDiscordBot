@@ -1,0 +1,14 @@
+{
+  "name": "n_gamediscordbot",
+  "version": "1.0.0",
+  "description": "Discord Bot with basic macros and upcoming Gemini API integration",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  }
+}
