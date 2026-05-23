@@ -41,8 +41,9 @@ export async function handleLolPatchCommand(message, isPrev = false) {
     if (fs.existsSync(cacheFilePath)) {
       console.log(`[Cache Hit] 이미 구워진 캐시 파일을 발견했습니다: ${cacheFileName}`);
       
-      const normalizedPath = cacheFilePath.replace(/\\/g, '/');
-      htmlLink = `file:///${normalizedPath}`;
+      const username = process.env.GITHUB_USERNAME || 'aibeargrylls95';
+      const repo = process.env.GITHUB_REPO || 'N_GameDiscordBot';
+      htmlLink = `https://${username}.github.io/${repo}/public/rendered/${cacheFileName}`;
       isCached = true;
     } else {
       // 🆕 [Cache Miss] 최초 1회 요청! 진짜 실시간 크롤러를 깨웁니다!
